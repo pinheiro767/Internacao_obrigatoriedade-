@@ -552,7 +552,7 @@
       </div>
       <div class="field">
        <label>Resumo clínico (objetivo)</label> <textarea id="doc_resumo" placeholder="Ex.: ATQ há 5 anos. Recorrência de abscesso/edema em topografia de prótese. Antibiótico recente. Suspeita de processo infeccioso em investigação..."></textarea>
-      </div><button type="button" class="doc-btn" id="btnDoctorTxt">📄 Baixar Relatório (PDF)</button>
+      </div><button type="button" class="doc-btn" id="btnDoctorTxt">⬇️ Baixar Relatório (PDF)</button>
       <div class="doc-note">
        <b>Dica:</b> Peça também registro em prontuário e, se possível, parecer da CCIH/SCIH.
       </div>
@@ -586,15 +586,14 @@
       </div><label class="doc-opt"> <input type="checkbox" id="fam_incluir_lei" checked>
        <div>
         <strong>Incluir fundamentação jurídica</strong> <span>Lei 9.656/98 + CDC (curto e objetivo)</span>
-       </div></label> <button type="button" class="doc-btn" id="btnFamilyTxt" style="margin-top:10px;">📧 Baixar Notificação (PDF)</button>
+       </div></label> <button type="button" class="doc-btn" id="btnFamilyTxt" style="margin-top:10px;">⬇️ Baixar Notificação (PDF)</button>
       <div class="doc-note">
        <b>Onde protocolar:</b> (1) autorizações do hospital → (2) SAC do plano (peça protocolo) → (3) ouvidoria → (4) ANS/PROCON se negativa.
       </div>
      </div>
     </div>
    </div>
-  </div><!-- PDF Library & Zing Sound -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  </div><!-- Audio Context for Zing Sound -->
   <script>
     // Zing sound on button click
     function playZingSound(){
@@ -846,28 +845,52 @@ Anexos: Relatório Médico (original assinado e carimbo)
 `;
 }
 
-function downloadText(filename, content){
+function downloadPDF(filename, content){
+  const pdfdoc = `%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length ${content.length + 200} >>
+stream
+BT
+/F1 10 Tf
+50 750 Td
+1 0 0 1 0 0 Tm
+0 0 0 rg
+${content.split('\n').map((line, i) => `(${line.replace(/[()\\]/g, '\\$&')}) Tj\n0 -12 Td`).join('\n')}
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000214 00000 n 
+0000000468 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+${512 + content.length}
+%%EOF`;
+  
   const a = document.createElement("a");
-  a.href = "data:text/plain;charset=utf-8," + encodeURIComponent(content);
-  a.download = filename;
+  a.href = "data:application/pdf;base64," + btoa(pdfdoc);
+  a.download = filename.endsWith('.pdf') ? filename : filename + '.pdf';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-}
-
-function downloadPDF(filename, content){
-  const element = document.createElement('div');
-  element.innerHTML = `<pre style="font-family: 'Courier New', monospace; font-size: 10pt; white-space: pre-wrap; word-wrap: break-word;">${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>`;
-  
-  const opt = {
-    margin: 10,
-    filename: filename,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-  
-  html2pdf().set(opt).from(element).save();
 }
 
 // Events
@@ -881,5 +904,5 @@ document.getElementById("btnFamilyTxt").addEventListener("click", function(){
   downloadPDF("Notificacao_Plano_Isolamento.pdf", buildFamilyNotification());
 });
 </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d31161e96534585',t:'MTc3MTk1ODM3NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d313074077328b1',t:'MTc3MTk1OTQ1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
