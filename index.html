@@ -419,7 +419,7 @@
   <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
   <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
   <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
  </head>
  <body>
   <div class="wrap">
@@ -554,8 +554,7 @@
       <div class="field">
        <label>Resumo clínico (objetivo)</label> <textarea id="doc_resumo" placeholder="Ex.: ATQ há 5 anos. Recorrência de abscesso/edema em topografia de prótese. Antibiótico recente. Suspeita de processo infeccioso em investigação..."></textarea>
       </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap">
-       <button type="button" class="doc-btn" id="btnDoctorTxt">⬇️ Baixar Relatório (TXT)</button> <button type="button" class="doc-btn" style="background: linear-gradient(135deg, #9333ea 0%, #c084fc 100%); border-color: rgba(147,51,234,.40);" id="btnDoctorPdf">📄 Baixar Relatório (PDF)</button>
+      <div class="controls" style="display: flex; gap: 8px; margin-top: 12px;"><button type="button" class="doc-btn" id="btnDoctorTxt">⬇️ TXT</button> <button type="button" class="doc-btn" id="btnDoctorPdf">📄 PDF</button>
       </div>
       <div class="doc-note">
        <b>Dica:</b> Peça também registro em prontuário e, se possível, parecer da CCIH/SCIH.
@@ -591,8 +590,7 @@
        <div>
         <strong>Incluir fundamentação jurídica</strong> <span>Lei 9.656/98 + CDC (curto e objetivo)</span>
        </div></label>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px">
-       <button type="button" class="doc-btn" id="btnFamilyTxt">⬇️ Baixar Notificação (TXT)</button> <button type="button" class="doc-btn" style="background: linear-gradient(135deg, #9333ea 0%, #c084fc 100%); border-color: rgba(147,51,234,.40);" id="btnFamilyPdf">📄 Baixar Notificação (PDF)</button>
+      <div class="controls" style="display: flex; gap: 8px; margin-top: 12px;"><button type="button" class="doc-btn" id="btnFamilyTxt">⬇️ TXT</button> <button type="button" class="doc-btn" id="btnFamilyPdf">📄 PDF</button>
       </div>
       <div class="doc-note">
        <b>Onde protocolar:</b> (1) autorizações do hospital → (2) SAC do plano (peça protocolo) → (3) ouvidoria → (4) ANS/PROCON se negativa.
@@ -869,7 +867,7 @@ document.getElementById("btnDoctorTxt").addEventListener("click", function(){
 
 document.getElementById("btnDoctorPdf").addEventListener("click", function(){
   playZingSound();
-  downloadPdfDoctor();
+  generatePdf("Relatorio_Medico_Isolamento.pdf", buildDoctorReport());
 });
 
 document.getElementById("btnFamilyTxt").addEventListener("click", function(){
@@ -879,165 +877,29 @@ document.getElementById("btnFamilyTxt").addEventListener("click", function(){
 
 document.getElementById("btnFamilyPdf").addEventListener("click", function(){
   playZingSound();
-  downloadPdfFamily();
+  generatePdf("Notificacao_Plano_Isolamento.pdf", buildFamilyNotification());
 });
 
-function downloadPdfDoctor(){
-  const hospital = document.getElementById("doc_hospital").value.trim() || "[Hospital/Unidade]";
-  const paciente = document.getElementById("doc_paciente").value.trim() || "[Paciente]";
-  const data = document.getElementById("doc_data").value.trim() || "[Data]";
-  const medico = document.getElementById("doc_medico").value.trim() || "[Médico assistente]";
-  const crm = document.getElementById("doc_crm").value.trim() || "[CRM]";
-  const prec = document.getElementById("doc_prec").value.trim() || "[Precaução a definir]";
-  const resumo = document.getElementById("doc_resumo").value.trim() || "[Resumo clínico objetivo]";
-
-  const htmlContent = `
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 40px; }
-        h1 { text-align: center; font-size: 18px; margin-bottom: 30px; }
-        .header { margin-bottom: 20px; }
-        .section { margin: 20px 0; }
-        .divider { border-top: 1px solid #000; margin: 20px 0; }
-        pre { white-space: pre-wrap; word-wrap: break-word; font-family: Arial, sans-serif; }
-      </style>
-    </head>
-    <body>
-      <h1>RELATÓRIO MÉDICO – INDICAÇÃO DE ISOLAMENTO HOSPITALAR (TÉCNICO)</h1>
-      <div class="header">
-        <p><strong>Hospital/Unidade:</strong> ${hospital}</p>
-        <p><strong>Paciente:</strong> ${paciente}</p>
-        <p><strong>Data:</strong> ${data}</p>
-        <p><strong>Médico assistente:</strong> ${medico}</p>
-        <p><strong>CRM:</strong> ${crm}</p>
-      </div>
-      <div class="divider"></div>
-      <div class="section">
-        <h2>1) QUADRO CLÍNICO (resumo objetivo)</h2>
-        <p>${resumo.replace(/\n/g, '<br>')}</p>
-      </div>
-      <div class="divider"></div>
-      <div class="section">
-        <h2>2) INDICAÇÃO ASSISTENCIAL</h2>
-        <p>Diante do quadro apresentado e considerando princípios de segurança assistencial e controle de infecção hospitalar, indico formalmente:</p>
-        <p><strong>▶ ${prec}</strong></p>
-        <p>Com necessidade de acomodação em <strong>QUARTO PRIVATIVO PARA ISOLAMENTO</strong>, como medida integrante do plano terapêutico e necessária à segurança assistencial.</p>
-      </div>
-      <div class="divider"></div>
-      <div class="section">
-        <h2>3) OBSERVAÇÃO</h2>
-        <p>A acomodação privativa por isolamento <strong>NÃO</strong> constitui medida de conforto, mas condição <strong>NECESSÁRIA</strong> para execução adequada da conduta médica proposta.</p>
-      </div>
-      <div class="divider"></div>
-      <div class="section">
-        <p style="margin-top: 60px;">
-          <strong>Assinatura:</strong> _______________________________________<br><br>
-          <strong>Carimbo/CRM:</strong> _______________________________________<br><br>
-          <strong>Data:</strong> _______________________________________
-        </p>
-      </div>
-    </body>
-    </html>
-  `;
-
-  const element = document.createElement('div');
-  element.innerHTML = htmlContent;
+function generatePdf(filename, content){
+  const element = document.createElement("div");
+  element.style.padding = "20px";
+  element.style.fontFamily = "Arial, sans-serif";
+  element.style.fontSize = "11px";
+  element.style.lineHeight = "1.5";
+  element.style.whiteSpace = "pre-wrap";
+  element.style.wordWrap = "break-word";
+  element.textContent = content;
   
   const opt = {
     margin: 10,
-    filename: 'Relatorio_Medico_Isolamento.pdf',
+    filename: filename,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2 },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
-
-  html2pdf().set(opt).fromString(htmlContent).save();
-}
-
-function downloadPdfFamily(){
-  const operadora = document.getElementById("fam_operadora").value.trim() || "[Operadora]";
-  const paciente = document.getElementById("fam_paciente").value.trim() || "[Paciente]";
-  const cart = document.getElementById("fam_cart").value.trim() || "[Carteirinha]";
-  const hospital = document.getElementById("fam_hospital").value.trim() || "[Hospital]";
-  const resp = document.getElementById("fam_resp").value.trim() || "[Responsável]";
-  const contato = document.getElementById("fam_contato").value.trim() || "[Contato]";
-  const incluirLei = document.getElementById("fam_incluir_lei").checked;
-
-  const blocoLei = incluirLei ? `
-    <div class="section">
-      <h2>FUNDAMENTAÇÃO JURÍDICA</h2>
-      <p><strong>• Lei nº 9.656/1998 (Planos de Saúde)</strong></p>
-      <p style="margin-left: 20px;">Art. 12: Cobertura da assistência contratada.<br>
-      Art. 10: Vedação de cláusulas restritivas que esvaziem a finalidade assistencial do contrato.</p>
-      <p><strong>• Código de Defesa do Consumidor (Lei nº 8.078/1990)</strong></p>
-      <p style="margin-left: 20px;">Art. 4º: Proteção do consumidor.<br>
-      Art. 37: Vedação de práticas abusivas.<br>
-      Art. 50: Cláusulas abusivas são nulas de pleno direito.</p>
-      <p><strong>RESSALTE-SE:</strong> A acomodação privativa solicitada NÃO é "upgrade por conforto", mas CONDIÇÃO ASSISTENCIAL decorrente de indicação médica formal (isolamento por necessidade clínica ou controle de infecção).</p>
-    </div>
-  ` : '';
-
-  const htmlContent = `
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 40px; }
-        h1 { text-align: center; font-size: 18px; margin-bottom: 30px; }
-        h2 { font-size: 14px; margin-top: 20px; margin-bottom: 10px; }
-        .section { margin: 20px 0; }
-        .divider { border-top: 1px solid #000; margin: 20px 0; }
-        .header { margin-bottom: 20px; }
-      </style>
-    </head>
-    <body>
-      <h1>NOTIFICAÇÃO FORMAL À OPERADORA DE PLANO DE SAÚDE</h1>
-      <p style="text-align: center; margin-bottom: 30px;">Solicitação de Autorização – Acomodação em Isolamento</p>
-      <p><strong>À Operadora:</strong><br>${operadora}</p>
-      <div class="section">
-        <h2>Dados do Paciente:</h2>
-        <p><strong>Paciente:</strong> ${paciente}<br>
-        <strong>Nº Carteirinha:</strong> ${cart}<br>
-        <strong>Hospital/Unidade:</strong> ${hospital}</p>
-        <p><strong>Responsável:</strong><br>
-        ${resp}<br>
-        <strong>Contato:</strong> ${contato}</p>
-      </div>
-      <div class="divider"></div>
-      <div class="section">
-        <h2>OBJETO DA NOTIFICAÇÃO:</h2>
-        <p>Encaminhamos em anexo RELATÓRIO MÉDICO com indicação formal de internação em <strong>QUARTO PRIVATIVO PARA ISOLAMENTO</strong>, como medida assistencial integrante do plano terapêutico.</p>
-      </div>
-      <div class="section">
-        <h2>SOLICITAMOS:</h2>
-        <p>1) Autorização IMEDIATA para acomodação em quarto privativo por necessidade de isolamento.<br><br>
-        2) Confirmação de cobertura e informação de responsabilidade financeira (se houver).<br><br>
-        3) Em caso de NEGATIVA, envio de resposta formal por escrito, com JUSTIFICATIVA TÉCNICA ESPECÍFICA e número de protocolo.</p>
-      </div>
-      ${blocoLei}
-      <div class="divider"></div>
-      <div class="section">
-        <p style="margin-top: 60px;">Atenciosamente,<br><br>
-        ${resp}<br>
-        Contato: ${contato}<br><br>
-        <em>Anexos: Relatório Médico (original assinado e carimbo)</em></p>
-      </div>
-    </body>
-    </html>
-  `;
-
-  const opt = {
-    margin: 10,
-    filename: 'Notificacao_Plano_Isolamento.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  html2pdf().set(opt).fromString(htmlContent).save();
+  
+  html2pdf().set(opt).from(element).save();
 }
 </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d2f342b521802d8',t:'MTc3MTkzODYzMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d2f3ad8732202d8',t:'MTc3MTkzODkwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
  </html>
