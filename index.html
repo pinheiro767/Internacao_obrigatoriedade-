@@ -553,9 +553,7 @@
       </div>
       <div class="field">
        <label>Resumo clínico (objetivo)</label> <textarea id="doc_resumo" placeholder="Ex.: ATQ há 5 anos. Recorrência de abscesso/edema em topografia de prótese. Antibiótico recente. Suspeita de processo infeccioso em investigação..."></textarea>
-      </div>
-      <div class="controls" style="display: flex; gap: 8px; margin-top: 12px;"><button type="button" class="doc-btn" id="btnDoctorTxt">⬇️ TXT</button> <button type="button" class="doc-btn" id="btnDoctorPdf">📄 PDF</button>
-      </div>
+      </div><button type="button" class="doc-btn" id="btnDoctorPdf">📄 Baixar Relatório (PDF)</button>
       <div class="doc-note">
        <b>Dica:</b> Peça também registro em prontuário e, se possível, parecer da CCIH/SCIH.
       </div>
@@ -589,9 +587,7 @@
       </div><label class="doc-opt"> <input type="checkbox" id="fam_incluir_lei" checked>
        <div>
         <strong>Incluir fundamentação jurídica</strong> <span>Lei 9.656/98 + CDC (curto e objetivo)</span>
-       </div></label>
-      <div class="controls" style="display: flex; gap: 8px; margin-top: 12px;"><button type="button" class="doc-btn" id="btnFamilyTxt">⬇️ TXT</button> <button type="button" class="doc-btn" id="btnFamilyPdf">📄 PDF</button>
-      </div>
+       </div></label> <button type="button" class="doc-btn" id="btnFamilyTxt" style="margin-top:10px;">⬇️ Baixar Notificação (TXT)</button>
       <div class="doc-note">
        <b>Onde protocolar:</b> (1) autorizações do hospital → (2) SAC do plano (peça protocolo) → (3) ouvidoria → (4) ANS/PROCON se negativa.
       </div>
@@ -860,46 +856,49 @@ function downloadText(filename, content){
 }
 
 // Events
-document.getElementById("btnDoctorTxt").addEventListener("click", function(){
-  playZingSound();
-  downloadText("Relatorio_Medico_Isolamento.txt", buildDoctorReport());
-});
-
 document.getElementById("btnDoctorPdf").addEventListener("click", function(){
   playZingSound();
-  generatePdf("Relatorio_Medico_Isolamento.pdf", buildDoctorReport());
-});
-
-document.getElementById("btnFamilyTxt").addEventListener("click", function(){
-  playZingSound();
-  downloadText("Notificacao_Plano_Isolamento.txt", buildFamilyNotification());
-});
-
-document.getElementById("btnFamilyPdf").addEventListener("click", function(){
-  playZingSound();
-  generatePdf("Notificacao_Plano_Isolamento.pdf", buildFamilyNotification());
-});
-
-function generatePdf(filename, content){
-  const element = document.createElement("div");
-  element.style.padding = "20px";
-  element.style.fontFamily = "Arial, sans-serif";
-  element.style.fontSize = "11px";
-  element.style.lineHeight = "1.5";
-  element.style.whiteSpace = "pre-wrap";
-  element.style.wordWrap = "break-word";
+  const content = buildDoctorReport();
+  const element = document.createElement('div');
+  element.style.padding = '20px';
+  element.style.fontFamily = 'Arial, sans-serif';
+  element.style.lineHeight = '1.6';
+  element.style.whiteSpace = 'pre-wrap';
+  element.style.wordWrap = 'break-word';
   element.textContent = content;
   
-  const opt = {
+  const options = {
     margin: 10,
-    filename: filename,
+    filename: 'Relatorio_Medico_Isolamento.pdf',
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2 },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
   
-  html2pdf().set(opt).from(element).save();
-}
+  html2pdf().set(options).from(element).save();
+});
+
+document.getElementById("btnFamilyPdf").addEventListener("click", function(){
+  playZingSound();
+  const content = buildFamilyNotification();
+  const element = document.createElement('div');
+  element.style.padding = '20px';
+  element.style.fontFamily = 'Arial, sans-serif';
+  element.style.lineHeight = '1.6';
+  element.style.whiteSpace = 'pre-wrap';
+  element.style.wordWrap = 'break-word';
+  element.textContent = content;
+  
+  const options = {
+    margin: 10,
+    filename: 'Notificacao_Plano_Isolamento.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  
+  html2pdf().set(options).from(element).save();
+});
 </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d2f3ad8732202d8',t:'MTc3MTkzODkwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
- </html>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d2f419ce39002d8',t:'MTc3MTkzOTE4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
